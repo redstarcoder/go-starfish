@@ -6,7 +6,7 @@ A [><>](esolangs.org/wiki/Fish) interpreter written in Go.
 Installation
 ---------------
 
-Install [golang](http://golang.org/doc/install). To install or update the package draw2dui on your system, run:
+Install [golang](http://golang.org/doc/install). To install or update go-fish on your system, run:
 
 ```
 go get -u github.com/redstarcoder/go-fish

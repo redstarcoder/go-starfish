@@ -7,7 +7,7 @@ Package fish offers a library for running [><>](esolangs.org/wiki/Fish) programs
 Installation
 ---------------
 
-Install [golang](http://golang.org/doc/install). To install or update the package draw2dui on your system, run:
+Install [golang](http://golang.org/doc/install). To install or update the package fish on your system, run:
 
 ```
 go get -u github.com/redstarcoder/go-fish/fish

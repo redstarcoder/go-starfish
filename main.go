@@ -10,9 +10,9 @@ import (
 )
 
 var (
-	showcodebox = flag.Bool("c", false, "outputs the codebox each tick")
-	showstack = flag.Bool("s", false, "outputs the stack each tick")
-	help *bool = flag.Bool("h", false, "displays this help message")
+	showcodebox = flag.Bool("c", false, "output the codebox each tick")
+	showstack = flag.Bool("s", false, "output the stack each tick")
+	help *bool = flag.Bool("h", false, "display this help message")
 	delay = flag.Duration("t", 0, "time to sleep between ticks (ex: 100ms)")
 	compmode = flag.Bool("m", false, "run like the fishlanguage.com interpreter")
 	initialstack = &stack{[]float64{}}
@@ -39,7 +39,7 @@ func loadScript(fName string) string {
 
 func init() {
 	fName = os.Args[0]
-	flag.Var(initialstack, "i", "sets the initial stack (ex: '\"Example\" 10 \"stack\"')")
+	flag.Var(initialstack, "i", "set the initial stack (ex: '\"Example\" 10 \"stack\"')")
 }
 
 func main() {

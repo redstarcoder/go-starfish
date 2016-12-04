@@ -18,12 +18,12 @@ Usage
 ```
 $ go-fish -h
 Usage: go-fish [args] <file>
-  -c	outputs the codebox each tick
-  -h	displays this help message
+  -c	output the codebox each tick
+  -h	display this help message
   -i value
-    	sets the initial stack (ex: '"Example" 10 "stack"')
+    	set the initial stack (ex: '"Example" 10 "stack"')
   -m	run like the fishlanguage.com interpreter
-  -s	outputs the stack each tick
+  -s	output the stack each tick
   -t duration
     	time to sleep between ticks (ex: 100ms)
 ```

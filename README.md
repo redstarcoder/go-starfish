@@ -1,7 +1,7 @@
 go-fish
 ======
 
-A [><>](esolangs.org/wiki/Fish) interpreter written in Go.
+A [><>](http://esolangs.org/wiki/Fish) interpreter written in Go.
 
 Installation
 ---------------

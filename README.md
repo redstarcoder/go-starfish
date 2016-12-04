@@ -22,6 +22,7 @@ Usage: go-fish [args] <file>
   -h	displays this help message
   -i value
     	sets the initial stack (ex: '"Example" 10 "stack"')
+  -m	run like the fishlanguage.com interpreter
   -s	outputs the stack each tick
   -t duration
     	time to sleep between ticks (ex: 100ms)

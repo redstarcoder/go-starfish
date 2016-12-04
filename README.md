@@ -9,7 +9,7 @@ Installation
 Install [golang](http://golang.org/doc/install). To install or update go-fish on your system, run:
 
 ```
-go get -u github.com/redstarcoder/go-fish
+go install github.com/redstarcoder/go-fish
 ```
 
 Usage

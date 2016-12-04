@@ -13,6 +13,18 @@ Install [golang](http://golang.org/doc/install). To install or update the packag
 go get -u github.com/redstarcoder/go-fish/fish
 ```
 
+Testing
+--------------
+
+```
+$ go test -cover
+
+*"* H  e  l  l  o     t  e  s  t  !  "  ; 
+PASS
+coverage: 59.1% of statements
+ok  	github.com/redstarcoder/go-fish/fish	0.002s
+```
+
 Acknowledgments
 ---------------
 

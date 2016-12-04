@@ -443,7 +443,7 @@ func (cB *CodeBox) PrintBox() {
 
 func init() {
 	rand.Seed(int64(time.Now().Nanosecond()))
-	reader = make(chan byte)
+	reader = make(chan byte, 1024)
 	go func() {
 		var err error
 		b := make([]byte, 1)

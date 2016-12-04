@@ -112,9 +112,10 @@ type CodeBox struct {
 	stacks        []*Stack
 	p             int // Used to keep track of the current stack
 	StringMode    byte
+	compMode      bool
 }
 
-func NewCodeBox(script string, stack []float64) *CodeBox {
+func NewCodeBox(script string, stack []float64, compatibilityMode bool) *CodeBox {
 	cB := new(CodeBox)
 
 	script = strings.Replace(script, "\r", "", -1)
@@ -140,6 +141,7 @@ func NewCodeBox(script string, stack []float64) *CodeBox {
 	}
 
 	cB.stacks = []*Stack{NewStack(stack)}
+	cB.compMode = compatibilityMode
 
 	return cB
 }
@@ -404,7 +406,9 @@ func (cB *CodeBox) StackShiftLeft() {
 // ]
 func (cB *CodeBox) CloseStack() {
 	cB.p--
-	cB.stacks[cB.p+1].Reverse() // This is done to match the fishlanguage.com interpreter...
+	if cB.compMode {
+		cB.stacks[cB.p+1].Reverse() // This is done to match the fishlanguage.com interpreter...
+	}
 	cB.stacks[cB.p].S = append(cB.stacks[cB.p].S, cB.stacks[cB.p+1].S...)
 }
 
@@ -418,7 +422,9 @@ func (cB *CodeBox) NewStack(n int) {
 		cB.stacks[cB.p].S = cB.stacks[cB.p-1].S[len(cB.stacks[cB.p-1].S)-n:]
 		cB.stacks[cB.p].filledRegister = false
 	}
-	cB.stacks[cB.p].Reverse() // This is done to match the fishlanguage.com interpreter...
+	if cB.compMode {
+		cB.stacks[cB.p].Reverse() // This is done to match the fishlanguage.com interpreter...
+	}
 }
 
 func (cB *CodeBox) PrintBox() {

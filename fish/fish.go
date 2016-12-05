@@ -64,7 +64,7 @@ func (s *Stack) SwapTwo() {
 	s.S[len(s.S)-2] = x
 }
 
-// SwapThree implements "@": With 1,2,3,4, calling @ results in 1,4,2,3.
+// SwapThree implements "@": with [1,2,3,4], calling "@" results in [,4,2,3].
 func (s *Stack) SwapThree() {
 	x := s.S[len(s.S)-1]
 	y := s.S[len(s.S)-2]

@@ -352,6 +352,7 @@ func (cB *CodeBox) Swim() bool {
 	defer func() {
 		if r := recover(); r != nil {
 			cB.PrintBox()
+			fmt.Println("Stack:", cB.Stack())
 			println("something smells fishy...")
 			os.Exit(1)
 		}

@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// Direction is a value representing the direction a ><> is swimming.
 type Direction byte
 
 const (

@@ -2,8 +2,8 @@ package fish
 
 import (
 	"fmt"
-	"os"
 	"math/rand"
+	"os"
 	"strings"
 	"time"
 )
@@ -19,16 +19,20 @@ const (
 
 var reader chan byte
 
+// Stack is a type representing a stack in ><>. It holds the stack values in S, as well as a register. The
+// register may contain data, but will only be considered filled if filledRegister is also true.
 type Stack struct {
 	S              []float64
 	register       float64
 	filledRegister bool
 }
 
+// NewStack returns a pointer to a Stack populated with s.
 func NewStack(s []float64) *Stack {
 	return &Stack{S: s}
 }
 
+// Register implements "&".
 func (s *Stack) Register() {
 	if s.filledRegister {
 		s.Push(s.register)
@@ -39,11 +43,12 @@ func (s *Stack) Register() {
 	}
 }
 
+// Extend implements ":".
 func (s *Stack) Extend() {
 	s.Push(s.S[len(s.S)-1])
 }
 
-// r
+// Reverse implements "r".
 func (s *Stack) Reverse() {
 	newS := make([]float64, len(s.S))
 	for i, ii := 0, len(s.S)-1; ii >= 0; i, ii = i+1, ii-1 {
@@ -52,13 +57,14 @@ func (s *Stack) Reverse() {
 	s.S = newS
 }
 
+// SwapTwo implements "$".
 func (s *Stack) SwapTwo() {
 	x := s.S[len(s.S)-1]
 	s.S[len(s.S)-1] = s.S[len(s.S)-2]
 	s.S[len(s.S)-2] = x
 }
 
-// 1,2,3,4, calling @ results in 1,4,2,3
+// SwapThree implements "@": With 1,2,3,4, calling @ results in 1,4,2,3.
 func (s *Stack) SwapThree() {
 	x := s.S[len(s.S)-1]
 	y := s.S[len(s.S)-2]
@@ -67,24 +73,26 @@ func (s *Stack) SwapThree() {
 	s.S[len(s.S)-3] = x
 }
 
-// }
+// ShiftRight implements "}".
 func (s *Stack) ShiftRight() {
 	newS := make([]float64, 1, len(s.S))
 	newS[0] = s.Pop()
 	s.S = append(newS, s.S...)
 }
 
-// {
+// ShiftLeft implements "{".
 func (s *Stack) ShiftLeft() {
 	r := s.S[0]
 	s.S = s.S[1:]
 	s.Push(r)
 }
 
+// Push appends r to the end of the stack.
 func (s *Stack) Push(r float64) {
 	s.S = append(s.S, float64(r))
 }
 
+// Pop removes the value on the end of the stack and returns it.
 func (s *Stack) Pop() (r float64) {
 	if len(s.S) > 0 {
 		r = s.S[len(s.S)-1]
@@ -104,6 +112,8 @@ func longestLineLength(lines []string) (l int) {
 	return
 }
 
+// CodeBox is an object usually created with NewCodeBox. It contains a ><> program complete with a stack,
+// and is typically run in steps via CodeBox.Swim.
 type CodeBox struct {
 	Fx, Fy        int
 	FDir          Direction
@@ -115,6 +125,8 @@ type CodeBox struct {
 	compMode      bool
 }
 
+// NewCodeBox returns a pointer to a new CodeBox. "script" should be a complete ><> script, "stack" should
+// be the initial stack, and compatibilityMode should be set if fishinterpreter.com behaviour is needed.
 func NewCodeBox(script string, stack []float64, compatibilityMode bool) *CodeBox {
 	cB := new(CodeBox)
 
@@ -146,6 +158,7 @@ func NewCodeBox(script string, stack []float64, compatibilityMode bool) *CodeBox
 	return cB
 }
 
+// Exe executes the instruction the ><> is currently on top of. It returns true when it executes ";".
 func (cB *CodeBox) Exe(r byte) bool {
 	switch r {
 	default:
@@ -308,6 +321,7 @@ func (cB *CodeBox) Exe(r byte) bool {
 	return false
 }
 
+// Move changes the fish's x/y coordinates based on CodeBox.FDir.
 func (cB *CodeBox) Move() {
 	switch cB.FDir {
 	case Right:
@@ -333,6 +347,7 @@ func (cB *CodeBox) Move() {
 	}
 }
 
+// Swim causes the ><> to execute an instruction, then move. It returns true when it encounters ";".
 func (cB *CodeBox) Swim() bool {
 	defer func() {
 		if r := recover(); r != nil {
@@ -351,59 +366,62 @@ func (cB *CodeBox) Swim() bool {
 	return false
 }
 
+// Stack returns the underlying Stack slice.
 func (cB *CodeBox) Stack() []float64 {
 	return cB.stacks[cB.p].S
 }
 
+// Push appends r to the end of the current stack.
 func (cB *CodeBox) Push(r float64) {
 	cB.stacks[cB.p].Push(r)
 }
 
+// Pop removes the value on the end of the current stack and returns it.
 func (cB *CodeBox) Pop() float64 {
 	return cB.stacks[cB.p].Pop()
 }
 
-// l
+// StackLength implements "l" on the current stack.
 func (cB *CodeBox) StackLength() float64 {
 	return float64(len(cB.stacks[cB.p].S))
 }
 
-// &
+// Register implements "&" on the current stack.
 func (cB *CodeBox) Register() {
 	cB.stacks[cB.p].Register()
 }
 
-// r
+// ReverseStack implements "r" on the current stack.
 func (cB *CodeBox) ReverseStack() {
 	cB.stacks[cB.p].Reverse()
 }
 
-// :
+// ExtendStack implements ":" on the current stack.
 func (cB *CodeBox) ExtendStack() {
 	cB.stacks[cB.p].Extend()
 }
 
-// $
+// StackSwapTwo implements "$" on the current stack.
 func (cB *CodeBox) StackSwapTwo() {
 	cB.stacks[cB.p].SwapTwo()
 }
 
-// @
+// StackSwapThree implements "@" on the current stack.
 func (cB *CodeBox) StackSwapThree() {
 	cB.stacks[cB.p].SwapThree()
 }
 
-// }
+// StackShiftRight implements "}" on the current stack.
 func (cB *CodeBox) StackShiftRight() {
 	cB.stacks[cB.p].ShiftRight()
 }
 
-// {
+// StackShiftLeft implements "{" on the current stack.
 func (cB *CodeBox) StackShiftLeft() {
 	cB.stacks[cB.p].ShiftLeft()
 }
 
-// ]
+// CloseStack implements "]".
 func (cB *CodeBox) CloseStack() {
 	cB.p--
 	if cB.compMode {
@@ -412,7 +430,7 @@ func (cB *CodeBox) CloseStack() {
 	cB.stacks[cB.p].S = append(cB.stacks[cB.p].S, cB.stacks[cB.p+1].S...)
 }
 
-// [
+// NewStack implements "[".
 func (cB *CodeBox) NewStack(n int) {
 	cB.p++
 	if cB.p == len(cB.stacks) {
@@ -427,6 +445,7 @@ func (cB *CodeBox) NewStack(n int) {
 	}
 }
 
+// PrintBox outputs the codebox to stdout.
 func (cB *CodeBox) PrintBox() {
 	println()
 	for y, line := range cB.Box {
@@ -450,7 +469,7 @@ func init() {
 		for err == nil {
 			_, err = os.Stdin.Read(b)
 			if err == nil {
-				reader <-b[0]
+				reader <- b[0]
 			}
 		}
 	}()

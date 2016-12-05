@@ -115,13 +115,13 @@ func longestLineLength(lines []string) (l int) {
 // CodeBox is an object usually created with NewCodeBox. It contains a ><> program complete with a stack,
 // and is typically run in steps via CodeBox.Swim.
 type CodeBox struct {
-	Fx, Fy        int
-	FDir          Direction
-	Width, Height int
-	Box           [][]byte
+	fX, fY        int
+	fDir          Direction
+	width, height int
+	box           [][]byte
 	stacks        []*Stack
 	p             int // Used to keep track of the current stack
-	StringMode    byte
+	stringMode    byte
 	compMode      bool
 }
 
@@ -136,19 +136,19 @@ func NewCodeBox(script string, stack []float64, compatibilityMode bool) *CodeBox
 	}
 
 	lines := strings.Split(script, "\n")
-	cB.Width = longestLineLength(lines)
-	cB.Height = len(lines)
+	cB.width = longestLineLength(lines)
+	cB.height = len(lines)
 
-	cB.Box = make([][]byte, cB.Height)
+	cB.box = make([][]byte, cB.height)
 	for i, s := range lines {
-		cB.Box[i] = make([]byte, cB.Width)
-		for ii, r := 0, byte(0); ii < cB.Width; ii++ {
+		cB.box[i] = make([]byte, cB.width)
+		for ii, r := 0, byte(0); ii < cB.width; ii++ {
 			if ii < len(s) {
 				r = byte(s[ii])
 			} else {
 				r = ' '
 			}
-			cB.Box[i][ii] = byte(r)
+			cB.box[i][ii] = byte(r)
 		}
 	}
 
@@ -167,65 +167,65 @@ func (cB *CodeBox) Exe(r byte) bool {
 	case ';':
 		return true
 	case '>':
-		cB.FDir = Right
+		cB.fDir = Right
 	case 'v':
-		cB.FDir = Down
+		cB.fDir = Down
 	case '<':
-		cB.FDir = Left
+		cB.fDir = Left
 	case '^':
-		cB.FDir = Up
+		cB.fDir = Up
 	case '|':
-		if cB.FDir == Right {
-			cB.FDir = Left
-		} else if cB.FDir == Left {
-			cB.FDir = Right
+		if cB.fDir == Right {
+			cB.fDir = Left
+		} else if cB.fDir == Left {
+			cB.fDir = Right
 		}
 	case '_':
-		if cB.FDir == Down {
-			cB.FDir = Up
-		} else if cB.FDir == Up {
-			cB.FDir = Down
+		if cB.fDir == Down {
+			cB.fDir = Up
+		} else if cB.fDir == Up {
+			cB.fDir = Down
 		}
 	case '#':
-		switch cB.FDir {
+		switch cB.fDir {
 		case Right:
-			cB.FDir = Left
+			cB.fDir = Left
 		case Down:
-			cB.FDir = Up
+			cB.fDir = Up
 		case Left:
-			cB.FDir = Right
+			cB.fDir = Right
 		case Up:
-			cB.FDir = Down
+			cB.fDir = Down
 		}
 	case '/':
-		switch cB.FDir {
+		switch cB.fDir {
 		case Right:
-			cB.FDir = Up
+			cB.fDir = Up
 		case Down:
-			cB.FDir = Left
+			cB.fDir = Left
 		case Left:
-			cB.FDir = Down
+			cB.fDir = Down
 		case Up:
-			cB.FDir = Right
+			cB.fDir = Right
 		}
 	case '\\':
-		switch cB.FDir {
+		switch cB.fDir {
 		case Right:
-			cB.FDir = Down
+			cB.fDir = Down
 		case Down:
-			cB.FDir = Right
+			cB.fDir = Right
 		case Left:
-			cB.FDir = Up
+			cB.fDir = Up
 		case Up:
-			cB.FDir = Left
+			cB.fDir = Left
 		}
 	case 'x':
-		cB.FDir = Direction(rand.Int31n(4))
+		cB.fDir = Direction(rand.Int31n(4))
 	case '"', '\'':
-		if cB.StringMode == 0 {
-			cB.StringMode = r
-		} else if r == cB.StringMode {
-			cB.StringMode = 0
+		if cB.stringMode == 0 {
+			cB.stringMode = r
+		} else if r == cB.stringMode {
+			cB.stringMode = 0
 		}
 	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 		cB.Push(float64(r - '0'))
@@ -284,8 +284,8 @@ func (cB *CodeBox) Exe(r byte) bool {
 			cB.Move()
 		}
 	case '.':
-		cB.Fy = int(cB.Pop())
-		cB.Fx = int(cB.Pop())
+		cB.fY = int(cB.Pop())
+		cB.fX = int(cB.Pop())
 	case ':':
 		cB.ExtendStack()
 	case '~':
@@ -305,9 +305,9 @@ func (cB *CodeBox) Exe(r byte) bool {
 	case 'l':
 		cB.Push(cB.StackLength())
 	case 'g':
-		cB.Push(float64(cB.Box[int(cB.Pop())][int(cB.Pop())]))
+		cB.Push(float64(cB.box[int(cB.Pop())][int(cB.Pop())]))
 	case 'p':
-		cB.Box[int(cB.Pop())][int(cB.Pop())] = byte(cB.Pop())
+		cB.box[int(cB.Pop())][int(cB.Pop())] = byte(cB.Pop())
 	case 'i':
 		r := float64(-1)
 		b := byte(0)
@@ -321,28 +321,28 @@ func (cB *CodeBox) Exe(r byte) bool {
 	return false
 }
 
-// Move changes the fish's x/y coordinates based on CodeBox.FDir.
+// Move changes the fish's x/y coordinates based on CodeBox.fDir.
 func (cB *CodeBox) Move() {
-	switch cB.FDir {
+	switch cB.fDir {
 	case Right:
-		cB.Fx++
-		if cB.Fx >= cB.Width {
-			cB.Fx = 0
+		cB.fX++
+		if cB.fX >= cB.width {
+			cB.fX = 0
 		}
 	case Down:
-		cB.Fy++
-		if cB.Fy >= cB.Height {
-			cB.Fy = 0
+		cB.fY++
+		if cB.fY >= cB.height {
+			cB.fY = 0
 		}
 	case Left:
-		cB.Fx--
-		if cB.Fx < 0 {
-			cB.Fx = cB.Width - 1
+		cB.fX--
+		if cB.fX < 0 {
+			cB.fX = cB.width - 1
 		}
 	case Up:
-		cB.Fy--
-		if cB.Fy < 0 {
-			cB.Fy = cB.Height - 1
+		cB.fY--
+		if cB.fY < 0 {
+			cB.fY = cB.height - 1
 		}
 	}
 }
@@ -357,7 +357,7 @@ func (cB *CodeBox) Swim() bool {
 		}
 	}()
 
-	if r := cB.Box[cB.Fy][cB.Fx]; cB.StringMode != 0 && r != cB.StringMode {
+	if r := cB.box[cB.fY][cB.fX]; cB.stringMode != 0 && r != cB.stringMode {
 		cB.Push(float64(r))
 	} else if cB.Exe(r) {
 		return true
@@ -448,9 +448,9 @@ func (cB *CodeBox) NewStack(n int) {
 // PrintBox outputs the codebox to stdout.
 func (cB *CodeBox) PrintBox() {
 	println()
-	for y, line := range cB.Box {
+	for y, line := range cB.box {
 		for x, r := range line {
-			if x != cB.Fx || y != cB.Fy {
+			if x != cB.fX || y != cB.fY {
 				print(" " + string(rune(r)) + " ")
 			} else {
 				print("*" + string(rune(r)) + "*")

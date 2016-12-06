@@ -11,6 +11,7 @@ import (
 
 var (
 	showcodebox = flag.Bool("c", false, "output the codebox each tick")
+	flagscript = flag.String("code", "", "execute the script supplied in 'code'")
 	showstack = flag.Bool("s", false, "output the stack each tick")
 	help *bool = flag.Bool("h", false, "display this help message")
 	delay = flag.Duration("t", 0, "time to sleep between ticks (ex: 100ms)")
@@ -45,11 +46,14 @@ func init() {
 func main() {
 	flag.Parse()
 	args := flag.Args()
-	if *help || len(args) == 0 {
+	if *help || (*flagscript == "" && len(args) == 0) {
 		Error()
 		return
 	}
-	script := loadScript(args[0])
+	var script string
+	if script = *flagscript; script == "" {
+		script = loadScript(args[0])
+	}
 
 	cB := starfish.NewCodeBox(script, initialstack.s, *compmode)
 	if !*showcodebox && !*showstack && *delay == 0 {

@@ -1,7 +1,8 @@
-package fish
+package starfish
 
 import (
 	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"os"
 	"strings"
@@ -104,6 +105,17 @@ func (s *Stack) Pop() (r float64) {
 	return
 }
 
+// getBytes removes c values from the stack, then returns them as a byte slice.
+func (s *Stack) getBytes(c int) []byte {
+	sData := s.S[len(s.S)-c:]
+	s.S = s.S[:len(s.S)-c]
+	bData := make([]byte, c)
+	for i, v := range sData {
+		bData[i] = byte(v)
+	}
+	return bData
+}
+
 func longestLineLength(lines []string) (l int) {
 	for _, s := range lines {
 		if len(s) > l {
@@ -124,6 +136,8 @@ type CodeBox struct {
 	p             int // Used to keep track of the current stack
 	stringMode    byte
 	compMode      bool
+	deepSea       bool
+	file          *os.File
 }
 
 // NewCodeBox returns a pointer to a new CodeBox. "script" should be a complete ><> script, "stack" should
@@ -162,31 +176,36 @@ func NewCodeBox(script string, stack []float64, compatibilityMode bool) *CodeBox
 // Exe executes the instruction the ><> is currently on top of. It returns true when it executes ";".
 func (cB *CodeBox) Exe(r byte) bool {
 	switch r {
-	default:
-		panic(r)
 	case ' ':
+		return false
 	case ';':
 		return true
 	case '>':
 		cB.fDir = Right
+		return false
 	case 'v':
 		cB.fDir = Down
+		return false
 	case '<':
 		cB.fDir = Left
+		return false
 	case '^':
 		cB.fDir = Up
+		return false
 	case '|':
 		if cB.fDir == Right {
 			cB.fDir = Left
 		} else if cB.fDir == Left {
 			cB.fDir = Right
 		}
+		return false
 	case '_':
 		if cB.fDir == Down {
 			cB.fDir = Up
 		} else if cB.fDir == Up {
 			cB.fDir = Down
 		}
+		return false
 	case '#':
 		switch cB.fDir {
 		case Right:
@@ -198,6 +217,7 @@ func (cB *CodeBox) Exe(r byte) bool {
 		case Up:
 			cB.fDir = Down
 		}
+		return false
 	case '/':
 		switch cB.fDir {
 		case Right:
@@ -209,6 +229,7 @@ func (cB *CodeBox) Exe(r byte) bool {
 		case Up:
 			cB.fDir = Right
 		}
+		return false
 	case '\\':
 		switch cB.fDir {
 		case Right:
@@ -220,8 +241,22 @@ func (cB *CodeBox) Exe(r byte) bool {
 		case Up:
 			cB.fDir = Left
 		}
+		return false
 	case 'x':
 		cB.fDir = Direction(rand.Int31n(4))
+	// *><> commands
+	case 'O':
+		cB.deepSea = false
+		return false
+	}
+
+	if cB.deepSea {
+		return false
+	}
+
+	switch r {
+	default:
+		panic(r)
 	case '"', '\'':
 		if cB.stringMode == 0 {
 			cB.stringMode = r
@@ -311,13 +346,53 @@ func (cB *CodeBox) Exe(r byte) bool {
 		cB.box[int(cB.Pop())][int(cB.Pop())] = byte(cB.Pop())
 	case 'i':
 		r := float64(-1)
-		b := byte(0)
-		select {
-		case b = <-reader:
-			r = float64(b)
-		default:
+		if cB.file == nil {
+			b := byte(0)
+			select {
+			case b = <-reader:
+				r = float64(b)
+			default:
+			}
+		} else {
+			bs := []byte{0}
+			n, _ := cB.file.Read(bs)
+			if n > 0 {
+				r = float64(bs[0])
+			}
 		}
 		cB.Push(r)
+	// *><> commands
+	case 'h':
+		cB.Push(float64(time.Now().Hour()))
+	case 'm':
+		cB.Push(float64(time.Now().Minute()))
+	case 's':
+		cB.Push(float64(time.Now().Second()))
+	case 'S':
+		time.Sleep(time.Millisecond * 100 * time.Duration(cB.Pop()))
+	case 'u':
+		cB.deepSea = true
+	case 'F':
+		var err error
+		count := int(cB.Pop())
+		bData := cB.stacks[cB.p].getBytes(count)
+		if cB.file != nil {
+			cB.file.Close()
+			err = ioutil.WriteFile(cB.file.Name(), bData, os.ModePerm)
+			if err != nil {
+				panic(err)
+			}
+			cB.file = nil
+		} else {
+			fName := string(bData)
+			cB.file, err = os.Open(fName)
+			if err != nil {
+				cB.file, err = os.Create(fName)
+				if err != nil {
+					panic(err)
+				}
+			}
+		}
 	}
 	return false
 }

@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/redstarcoder/go-fish/fish"
+	"github.com/redstarcoder/go-starfish/starfish"
 	"io/ioutil"
 	"os"
 	"time"
@@ -51,7 +51,7 @@ func main() {
 	}
 	script := loadScript(args[0])
 
-	cB := fish.NewCodeBox(script, initialstack.s, *compmode)
+	cB := starfish.NewCodeBox(script, initialstack.s, *compmode)
 	if !*showcodebox && !*showstack && *delay == 0 {
 		for !cB.Swim() {}
 		return

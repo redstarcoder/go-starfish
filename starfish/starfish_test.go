@@ -1,4 +1,4 @@
-package fish
+package starfish
 
 import (
 	"testing"

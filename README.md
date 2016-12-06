@@ -1,7 +1,7 @@
-go-fish
+go-starfish
 ======
 
-A [><>](http://esolangs.org/wiki/Fish) interpreter written in Go.
+A \*><> interpreter written in Go. \*><> is a language derrived from [><>](http://esolangs.org/wiki/Fish).
 
 Installation
 ---------------
@@ -9,15 +9,15 @@ Installation
 Install [golang](http://golang.org/doc/install). To install or update go-fish on your system, run:
 
 ```
-go install github.com/redstarcoder/go-fish
+go install github.com/redstarcoder/go-starfish/cmd/starfish
 ```
 
 Usage
 ---------------
 
 ```
-$ go-fish -h
-Usage: go-fish [args] <file>
+$ starfish -h
+Usage: starfish [args] <file>
   -c	output the codebox each tick
   -h	display this help message
   -i value

@@ -21,7 +21,7 @@ $ go test -cover
 
 *"* H  e  l  l  o     t  e  s  t  !  "  ; 
 PASS
-coverage: 59.1% of statements
+coverage: 50.4% of statements
 ok  	github.com/redstarcoder/go-starfish/starfish	0.002s
 ```
 

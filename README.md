@@ -19,6 +19,8 @@ Usage
 $ starfish -h
 Usage: starfish [args] <file>
   -c	output the codebox each tick
+  -code string
+    	execute the script supplied in 'code'
   -h	display this help message
   -i value
     	set the initial stack (ex: '"Example" 10 "stack"')

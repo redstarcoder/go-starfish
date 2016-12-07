@@ -47,7 +47,7 @@ func (s *stack) Set(str string) error {
 	if f, err := strconv.ParseFloat(string(runes), 64); err == nil {
 		s.s = append(s.s, f)
 		runes = make([]rune, 0, 32)
-	} else {
+	} else if len(runes) > 0 {
 		return err
 	}
 	return nil

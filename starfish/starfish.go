@@ -244,6 +244,7 @@ func (cB *CodeBox) Exe(r byte) bool {
 		return false
 	case 'x':
 		cB.fDir = Direction(rand.Int31n(4))
+		return false
 	// *><> commands
 	case 'O':
 		cB.deepSea = false
@@ -256,7 +257,7 @@ func (cB *CodeBox) Exe(r byte) bool {
 
 	switch r {
 	default:
-		panic(r)
+		panic(string(r))
 	case '"', '\'':
 		if cB.stringMode == 0 {
 			cB.stringMode = r

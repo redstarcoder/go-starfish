@@ -1,3 +1,4 @@
+// See https://esolangs.org/wiki/Starfish for more info.
 package starfish
 
 import (
@@ -394,6 +395,10 @@ func (cB *CodeBox) Exe(r byte) bool {
 				}
 			}
 		}
+	case 'C':
+		cB.Call()
+	case 'R':
+		cB.Ret()
 	}
 	return false
 }
@@ -523,6 +528,28 @@ func (cB *CodeBox) NewStack(n int) {
 	}
 }
 
+// Call implements "C".
+func (cB *CodeBox) Call() {
+	cB.p++
+	if cB.p == len(cB.stacks) {
+		cB.stacks = append(cB.stacks, NewStack([]float64{float64(cB.fX), float64(cB.fY)}))
+		cB.stacks[cB.p], cB.stacks[cB.p-1] = cB.stacks[cB.p-1], cB.stacks[cB.p]
+	} else {
+		cB.stacks[cB.p] = cB.stacks[cB.p-1]
+		cB.stacks[cB.p-1] = NewStack([]float64{float64(cB.fX), float64(cB.fY)})
+	}
+	cB.fY = int(cB.Pop())
+	cB.fX = int(cB.Pop())
+}
+
+// Ret implements "R".
+func (cB *CodeBox) Ret() {
+	cB.p--
+	cB.fY = int(cB.Pop())
+	cB.fX = int(cB.Pop())
+	cB.stacks[cB.p] = cB.stacks[cB.p+1]
+}
+
 // PrintBox outputs the codebox to stdout.
 func (cB *CodeBox) PrintBox() {
 	println()
@@ -547,7 +574,7 @@ func init() {
 		for err == nil {
 			n, err := os.Stdin.Read(b)
 			if err == nil {
-				for i := 0;i < n;i++ {
+				for i := 0; i < n; i++ {
 					reader <- b[i]
 				}
 			}

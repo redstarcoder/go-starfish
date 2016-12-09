@@ -543,11 +543,13 @@ func init() {
 	reader = make(chan byte, 1024)
 	go func() {
 		var err error
-		b := make([]byte, 1)
+		b := make([]byte, 1024)
 		for err == nil {
-			_, err = os.Stdin.Read(b)
+			n, err := os.Stdin.Read(b)
 			if err == nil {
-				reader <- b[0]
+				for i := 0;i < n;i++ {
+					reader <- b[i]
+				}
 			}
 		}
 	}()

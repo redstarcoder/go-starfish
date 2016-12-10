@@ -179,8 +179,6 @@ func (cB *CodeBox) Exe(r byte) bool {
 	switch r {
 	case ' ':
 		return false
-	case ';':
-		return true
 	case '>':
 		cB.fDir = Right
 		return false
@@ -259,6 +257,8 @@ func (cB *CodeBox) Exe(r byte) bool {
 	switch r {
 	default:
 		panic(string(r))
+	case ';':
+		return true
 	case '"', '\'':
 		if cB.stringMode == 0 {
 			cB.stringMode = r

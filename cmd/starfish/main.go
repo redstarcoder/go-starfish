@@ -63,6 +63,7 @@ func main() {
 
 	run.Call("addEventListener", "click", func() {
 		run.Set("disabled", true)
+		output.Set("innerHTML", "")
 		go func() {
 			stop = false
 			pause = false

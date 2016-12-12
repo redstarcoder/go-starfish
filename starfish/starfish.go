@@ -29,8 +29,6 @@ const (
 	Up
 )
 
-var reader chan byte
-
 // Stack is a type representing a stack in ><>. It holds the stack values in S, as well as a register. The
 // register may contain data, but will only be considered filled if filledRegister is also true.
 type Stack struct {
@@ -585,17 +583,4 @@ func (cB *CodeBox) PrintBox() {
 
 func init() {
 	rand.Seed(int64(time.Now().Nanosecond()))
-	reader = make(chan byte, 1024)
-	/*go func() {
-		var err error
-		b := make([]byte, 1024)
-		for err == nil {
-			n, err := os.Stdin.Read(b)
-			if err == nil {
-				for i := 0; i < n; i++ {
-					reader <- b[i]
-				}
-			}
-		}
-	}()*/
 }

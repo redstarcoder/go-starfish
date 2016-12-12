@@ -1,5 +1,14 @@
 <html><head>
 	<title>starfish</title>
+	<script language="javascript" src="lz-string.min.js"></script>
+	<script language="javascript">
+function getUrlVars() {
+	var vars = {};
+	var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+		vars[key] = value;
+	});
+	return vars;
+}</script>
 </head>
 
 <body>
@@ -8,8 +17,10 @@
 	<button id="run" type="button">Run</button>
 	<button id="pause" type="button">Pause</button>
 	<button id="end" type="button">Stop</button>
+	<button id="share" type="button">Share</button>
 	Delay (ms): <input id="delay" type="text" value="100"></input><br />
 	
+	Share: <input id="sharefield" type="text" value=""><br />
 	Initial stack: <input id="initialstack" type="text" value=""></input><br />
 	Input: <input id="inputfield" type="text" value="">
 	<button id="give" type="button">Give</button></input><br /><br />
@@ -20,5 +31,5 @@
 	Output: <div id="output" style="font-family:monospace;"></div><br /><br />
 	
 	<div><span>This was quickly written using GopherJS by redstarcoder. For more information on *><> click <a href="https://github.com/redstarcoder/go-starfish">here</a>. Carriage return clears the output, file I/O isn't emulated yet.</span></div>
-	<script src="starfish.js"></script>
+	<script language="javascript" src="starfish.js"></script>
 </body></html>

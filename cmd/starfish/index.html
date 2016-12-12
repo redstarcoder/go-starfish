@@ -9,6 +9,23 @@ function getUrlVars() {
 	});
 	return vars;
 }</script>
+<style>
+c {
+    width:1.5em;
+    display:inline-block;
+    text-align:center;
+}
+
+.s {
+	color:red;
+	background-color:black;
+}
+
+.u {
+	color:blue;
+	background-color:white;
+}
+</style>
 </head>
 
 <body>
@@ -25,11 +42,16 @@ function getUrlVars() {
 	Input: <textarea id="inputfield" cols="40" rows="2" value=""></textarea>
 	<button id="give" type="button">Give</button></input><br /><br />
 	
-	<div id="codebox" style="font-family:monospace;"></div>
+	<button id="showhide" type="button">Show CodeBox</button><br />
+	<div id="codebox" style="font-family:monospace;font-weight:bold;font-size:1.1em;background-color:#E0FFFF;display:none;"></div>
 	Stack: <div id="stack" style="font-family:monospace;"></div><br />
 	Input: <div id="input" style="font-family:monospace;"></div><br />
 	Output: <div id="output" style="font-family:monospace;"></div><br /><br />
 	
-	<div><span>This was quickly written using GopherJS by redstarcoder. For more information on *><> click <a href="https://github.com/redstarcoder/go-starfish">here</a>. Carriage return clears the output, file I/O isn't emulated yet.</span></div>
+	<div><p>This was quickly written using GopherJS by redstarcoder. For more information on *><> click <a href="https://github.com/redstarcoder/go-starfish">here</a>.</p>
+	<p><h3>Interpreter specific info</h3>
+	- Carriage return clears the output<br />
+	- File I/O isn't emulated yet<br />
+	- CodeBox drawing is extremely inefficient</p></div>
 	<script language="javascript" src="starfish.js"></script>
 </body></html>

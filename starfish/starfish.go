@@ -283,14 +283,14 @@ func (cB *CodeBox) Exe(r byte) bool {
 	case 'o':
 		x := byte(cB.Pop())
 		if x == '\n' {
-			cB.Output.Set("innerHTML", cB.Output.Get("innerHTML").String() + "<br />")
+			cB.Output.Set("innerHTML", cB.Output.Get("innerHTML").String()+"<br />")
 		} else if x == '\r' {
 			cB.Output.Set("innerHTML", "")
 		} else {
-			cB.Output.Set("innerHTML", cB.Output.Get("innerHTML").String() + string(x))
+			cB.Output.Set("innerHTML", cB.Output.Get("innerHTML").String()+string(x))
 		}
 	case 'n':
-		cB.Output.Set("innerHTML", cB.Output.Get("innerHTML").String() + fmt.Sprintf("%v", cB.Pop()))
+		cB.Output.Set("innerHTML", cB.Output.Get("innerHTML").String()+fmt.Sprintf("%v", cB.Pop()))
 	case 'r':
 		cB.ReverseStack()
 	case '+':
@@ -365,7 +365,7 @@ func (cB *CodeBox) Exe(r byte) bool {
 	case 'i':
 		r := float64(-1)
 		if cB.file == nil {
-			if data := cB.Input.Get("innerHTML").String();data != "" {
+			if data := cB.Input.Get("innerHTML").String(); data != "" {
 				r = float64(data[0])
 				cB.Input.Set("innerHTML", data[1:])
 			}
@@ -449,7 +449,7 @@ func (cB *CodeBox) Swim() (exit bool) {
 		if r := recover(); r != nil {
 			cB.PrintBox()
 			cB.JSObjects.Stack.Set("innerHTML", fmt.Sprintln(cB.Stack()))
-			cB.Output.Set("innerHTML", cB.Output.Get("innerHTML").String() + "<br />something smells fishy...")
+			cB.Output.Set("innerHTML", cB.Output.Get("innerHTML").String()+"<br />something smells fishy...")
 			exit = true
 		}
 	}()
@@ -566,19 +566,25 @@ func (cB *CodeBox) Ret() {
 
 // PrintBox outputs the codebox to stdout.
 func (cB *CodeBox) PrintBox() {
-	output := make([]rune, 0, cB.width*3 * cB.height + (cB.height+1)*6)
-	output = append(output, []rune("<br />")...)
+	output := make([]rune, 0, cB.width*3*cB.height+(cB.height+1)*6)
+	output = append(output, []rune("<br>")...)
 	for y, line := range cB.box {
 		for x, r := range line {
 			if x != cB.fX || y != cB.fY {
-				output = append(output, ' ', rune(r), ' ')
+				output = append(output, []rune(`<c>`)...)
 			} else {
-				output = append(output, '*', rune(r), '*')
+				if !cB.deepSea {
+					output = append(output, []rune(`<c class="s">`)...)
+				} else {
+					output = append(output, []rune(`<c class="u">`)...)
+				}
 			}
+			output = append(output, rune(r))
+			output = append(output, []rune("</c>")...)
 		}
-		output = append(output, []rune("<br />")...)
+		output = append(output, []rune("<br>")...)
 	}
-	cB.CodeBox.Set("innerHTML", string(output))
+	cB.CodeBox.Set("innerHTML", "<pre>"+string(output)+"<br></pre>")
 }
 
 func init() {

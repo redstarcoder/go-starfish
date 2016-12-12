@@ -8,7 +8,16 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/gopherjs/gopherjs/js"
 )
+
+type JSObjects struct {
+	Output  *js.Object
+	Input   *js.Object
+	Stack   *js.Object
+	CodeBox *js.Object
+}
 
 // Direction is a value representing the direction a ><> is swimming.
 type Direction byte
@@ -129,6 +138,7 @@ func longestLineLength(lines []string) (l int) {
 // CodeBox is an object usually created with NewCodeBox. It contains a ><> program complete with a stack,
 // and is typically run in steps via CodeBox.Swim.
 type CodeBox struct {
+	JSObjects
 	fX, fY        int
 	fDir          Direction
 	width, height int
@@ -143,12 +153,12 @@ type CodeBox struct {
 
 // NewCodeBox returns a pointer to a new CodeBox. "script" should be a complete ><> script, "stack" should
 // be the initial stack, and compatibilityMode should be set if fishinterpreter.com behaviour is needed.
-func NewCodeBox(script string, stack []float64, compatibilityMode bool) *CodeBox {
+func NewCodeBox(script string, stack []float64, compatibilityMode bool, jsObjs JSObjects) *CodeBox {
 	cB := new(CodeBox)
 
 	script = strings.Replace(script, "\r", "", -1)
 	if len(script) == 0 || script == "\n" {
-		panic("Cannot accept script of length 0 (No room for the fish to survive).")
+		panic("Cannot accept script of length 0 (no room for the fish to survive).")
 	}
 
 	lines := strings.Split(script, "\n")
@@ -170,6 +180,7 @@ func NewCodeBox(script string, stack []float64, compatibilityMode bool) *CodeBox
 
 	cB.stacks = []*Stack{NewStack(stack)}
 	cB.compMode = compatibilityMode
+	cB.JSObjects = jsObjs
 
 	return cB
 }
@@ -272,9 +283,16 @@ func (cB *CodeBox) Exe(r byte) bool {
 	case '&':
 		cB.Register()
 	case 'o':
-		print(string(byte(cB.Pop())))
+		x := byte(cB.Pop())
+		if x == '\n' {
+			cB.Output.Set("innerHTML", cB.Output.Get("innerHTML").String() + "<br />")
+		} else if x == '\r' {
+			cB.Output.Set("innerHTML", "")
+		} else {
+			cB.Output.Set("innerHTML", cB.Output.Get("innerHTML").String() + string(x))
+		}
 	case 'n':
-		fmt.Printf("%v", cB.Pop())
+		cB.Output.Set("innerHTML", cB.Output.Get("innerHTML").String() + fmt.Sprintf("%v", cB.Pop()))
 	case 'r':
 		cB.ReverseStack()
 	case '+':
@@ -349,11 +367,9 @@ func (cB *CodeBox) Exe(r byte) bool {
 	case 'i':
 		r := float64(-1)
 		if cB.file == nil {
-			b := byte(0)
-			select {
-			case b = <-reader:
-				r = float64(b)
-			default:
+			if data := cB.Input.Get("innerHTML").String();data != "" {
+				r = float64(data[0])
+				cB.Input.Set("innerHTML", data[1:])
 			}
 		} else {
 			bs := []byte{0}
@@ -430,13 +446,13 @@ func (cB *CodeBox) Move() {
 }
 
 // Swim causes the ><> to execute an instruction, then move. It returns true when it encounters ";".
-func (cB *CodeBox) Swim() bool {
+func (cB *CodeBox) Swim() (exit bool) {
 	defer func() {
 		if r := recover(); r != nil {
 			cB.PrintBox()
-			fmt.Println("Stack:", cB.Stack())
-			println("something smells fishy...")
-			os.Exit(1)
+			cB.JSObjects.Stack.Set("innerHTML", fmt.Sprintln(cB.Stack()))
+			cB.Output.Set("innerHTML", cB.Output.Get("innerHTML").String() + "<br />something smells fishy...")
+			exit = true
 		}
 	}()
 
@@ -446,7 +462,7 @@ func (cB *CodeBox) Swim() bool {
 		return true
 	}
 	cB.Move()
-	return false
+	return
 }
 
 // Stack returns the underlying Stack slice.
@@ -552,23 +568,25 @@ func (cB *CodeBox) Ret() {
 
 // PrintBox outputs the codebox to stdout.
 func (cB *CodeBox) PrintBox() {
-	println()
+	output := make([]rune, 0, cB.width*3 * cB.height + (cB.height+1)*6)
+	output = append(output, []rune("<br />")...)
 	for y, line := range cB.box {
 		for x, r := range line {
 			if x != cB.fX || y != cB.fY {
-				print(" " + string(rune(r)) + " ")
+				output = append(output, ' ', rune(r), ' ')
 			} else {
-				print("*" + string(rune(r)) + "*")
+				output = append(output, '*', rune(r), '*')
 			}
 		}
-		println()
+		output = append(output, []rune("<br />")...)
 	}
+	cB.CodeBox.Set("innerHTML", string(output))
 }
 
 func init() {
 	rand.Seed(int64(time.Now().Nanosecond()))
 	reader = make(chan byte, 1024)
-	go func() {
+	/*go func() {
 		var err error
 		b := make([]byte, 1024)
 		for err == nil {
@@ -579,5 +597,5 @@ func init() {
 				}
 			}
 		}
-	}()
+	}()*/
 }

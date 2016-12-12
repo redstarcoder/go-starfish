@@ -32,7 +32,7 @@ func main() {
 	sharefield := js.Global.Get("sharefield")
 	share := js.Global.Get("share")
 
-	if s := js.Global.Call("getUrlVars").Get("script").String(); s != "" {
+	if s := js.Global.Call("getUrlVars").Get("script").String(); s != "undefined" {
 		script.Set("value", js.Global.Get("LZString").Call("decompressFromEncodedURIComponent", s).String())
 	}
 

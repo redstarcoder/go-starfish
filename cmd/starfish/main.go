@@ -32,6 +32,7 @@ func main() {
 	give := js.Global.Get("give")
 	sharefield := js.Global.Get("sharefield")
 	share := js.Global.Get("share")
+	sharebox := js.Global.Get("sharebox")
 	showhide := js.Global.Get("showhide")
 
 	if s := js.Global.Call("getUrlVars").Get("script").String(); s != "undefined" {
@@ -59,6 +60,8 @@ func main() {
 
 	share.Call("addEventListener", "click", func() {
 		sharefield.Set("value", url+"?script="+js.Global.Get("LZString").Call("compressToEncodedURIComponent", script.Get("value").String()).String())
+		sharebox.Get("style").Set("display", "block")
+		sharefield.Call("select")
 	})
 
 	give.Call("addEventListener", "click", func() {

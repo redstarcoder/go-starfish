@@ -10,6 +10,11 @@ function getUrlVars() {
 	return vars;
 }</script>
 <style>
+body {
+	font-family:sans-serif;
+	color:#0f0f0f;
+}
+	
 c {
     width:1.5em;
     display:inline-block;
@@ -25,33 +30,75 @@ c {
 	color:blue;
 	background-color:white;
 }
+
+input {
+	border-radius:5px;
+	padding:0.25em;
+}
+
+textarea {
+	border-radius:5px;
+	display:inline-block;
+    vertical-align:middle;
+}
+
+.box {
+	display:block;
+	width:90%;
+	border-style:solid;
+	border-radius:7px;
+	border-width:1px;
+	margin: 0 auto;
+	padding:1em;
+	border-color:#D3D3D3;
+}
+
+.desc {
+	display:inline-block;
+	text-align:center;
+	width:10em;
+	font-weight:bold;
+	color:#202020;
+	font-size:0.9em;
+	vertical-align:middle;
+}
 </style>
 </head>
 
-<body>
-	<textarea id="script" cols="40" rows="5"></textarea><br />
+<body style="background-color:#D3D3D3;">
+	<div style="width:75%;margin: 0 auto;border:solid;border-width:1px;padding:1em;border-radius:3px;background-color:white;">
+	<h1 style="text-align:center;">The online *><> interpreter</h1>
+	<textarea id="script" cols="40" rows="5" style="width:100%;" wrap="off"></textarea><br />
 	
+	<div style="margin:1em;">
 	<button id="run" type="button">Run</button>
 	<button id="pause" type="button">Pause</button>
 	<button id="end" type="button">Stop</button>
-	<button id="share" type="button">Share</button>
-	Delay (ms): <input id="delay" type="text" value="1"></input><br />
+	<button id="share" type="button">Share</button><br />
+	</div>
 	
-	Share: <input id="sharefield" type="text" value="" size=50><br />
-	Initial stack: <input id="initialstack" type="text" value=""></input><br />
-	Input: <textarea id="inputfield" cols="40" rows="2" value=""></textarea>
-	<button id="give" type="button">Give</button></input><br /><br />
+	<div class="box"><span class="desc">Share</span>
+	<input id="sharefield" type="text" value="" size=50 onClick="this.select();" style="width:80%;"></div><br />
+	<div class="box"><span class="desc">Delay (ms)</span>
+	<input id="delay" type="text" value="1"></input></div><br />
+	<div class="box"><span class="desc">Initial stack</span>
+	<input id="initialstack" type="text" value="" style="width:80%;"></input></div><br />
+	<div class="box"><span class="desc">Input</span>
+	<textarea id="inputfield" cols="40" rows="2" value="" style="display:inline-block;"></textarea>
+	<button id="give" type="button">Give</button></input></div><br /><br />
 	
-	<button id="showhide" type="button">Show CodeBox</button><br />
-	<div id="codebox" style="font-family:monospace;font-weight:bold;font-size:1.1em;background-color:#E0FFFF;display:none;"></div>
-	Stack: <div id="stack" style="font-family:monospace;"></div><br />
-	Input: <div id="input" style="font-family:monospace;"></div><br />
-	Output: <div id="output" style="font-family:monospace;"></div><br /><br />
+	<div class="box"><span class="desc"><button id="showhide" type="button">Show CodeBox</button></span>
+	<div id="codebox" style="font-family:monospace;font-weight:bold;font-size:1.1em;background-color:#E0FFFF;display:none;width:80%;vertical-align:middle;"></div></div><br />
+	<div class="box"><span class="desc">Stack</span>
+	<div id="stack" style="font-family:monospace;display:inline-block;vertical-align:middle;"></div></div><br />
+	<div class="box"><span class="desc">Input</span><div id="input" style="font-family:monospace;display:inline-block;vertical-align:middle;"></div></div><br />
+	<div class="box"><span class="desc">Output</span><div id="output" style="font-family:monospace;display:inline-block;vertical-align:middle;"></div></div><br /><br />
 	
-	<div><p>This was quickly written using GopherJS by redstarcoder. For more information on *><> click <a href="https://github.com/redstarcoder/go-starfish">here</a>.</p>
+	<div><p>This was written using GopherJS by redstarcoder. For more information on *><> click <a href="https://github.com/redstarcoder/go-starfish">here</a>.</p>
 	<p><h3>Interpreter specific info</h3>
 	- Carriage return clears the output<br />
 	- File I/O isn't emulated yet<br />
 	- CodeBox drawing is extremely inefficient</p></div>
+	</div>
 	<script language="javascript" src="starfish.js"></script>
 </body></html>

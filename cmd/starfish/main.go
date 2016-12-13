@@ -52,7 +52,7 @@ func main() {
 		} else {
 			showcodebox = true
 			showhide.Set("innerHTML", "Hide CodeBox")
-			codebox.Get("style").Set("display", "block")
+			codebox.Get("style").Set("display", "inline-block")
 		}
 		sharefield.Set("value", url+"?script="+js.Global.Get("LZString").Call("compressToEncodedURIComponent", script.Get("value").String()).String())
 	})
@@ -79,6 +79,7 @@ func main() {
 	run.Call("addEventListener", "click", func() {
 		run.Set("disabled", true)
 		output.Set("innerHTML", "")
+		sharefield.Set("value", url+"?script="+js.Global.Get("LZString").Call("compressToEncodedURIComponent", script.Get("value").String()).String())
 		go func() {
 			stop = false
 			pause = false

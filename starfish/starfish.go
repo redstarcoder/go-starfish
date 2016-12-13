@@ -566,7 +566,7 @@ func (cB *CodeBox) Ret() {
 
 // PrintBox outputs the codebox to stdout.
 func (cB *CodeBox) PrintBox() {
-	output := make([]rune, 0, cB.width*3*cB.height+(cB.height+1)*6)
+	output := make([]rune, 0, cB.width*7*cB.height+(cB.height+2)*4+10)
 	output = append(output, []rune("<br>")...)
 	for y, line := range cB.box {
 		for x, r := range line {

@@ -1,7 +1,7 @@
 go-starfish
 ======
 
-A \*><> interpreter written in Go. \*><> is a language derrived from [><>](http://esolangs.org/wiki/Fish).
+A [\*><>](https://esolangs.org/wiki/Starfish)  interpreter written in Go. \*><> is a language derrived from [><>](http://esolangs.org/wiki/Fish).
 
 Installation
 ---------------

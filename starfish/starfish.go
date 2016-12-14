@@ -399,6 +399,10 @@ func (cB *CodeBox) Exe(r byte) bool {
 		cB.Call()
 	case 'R':
 		cB.Ret()
+	case 'I':
+		cB.p++
+	case 'D':
+		cB.p--
 	}
 	return false
 }
@@ -451,7 +455,11 @@ func (cB *CodeBox) Swim() bool {
 
 // Stack returns the underlying Stack slice.
 func (cB *CodeBox) Stack() []float64 {
-	return cB.stacks[cB.p].S
+	if cB.p >= 0 && cB.p < len(cB.stacks) {
+		return cB.stacks[cB.p].S
+	} else {
+		return []float64{float64(cB.p)}
+	}
 }
 
 // Push appends r to the end of the current stack.
@@ -511,6 +519,11 @@ func (cB *CodeBox) CloseStack() {
 		cB.stacks[cB.p+1].Reverse() // This is done to match the fishlanguage.com interpreter...
 	}
 	cB.stacks[cB.p].S = append(cB.stacks[cB.p].S, cB.stacks[cB.p+1].S...)
+	if cB.p+2 == len(cB.stacks) {
+		cB.stacks = cB.stacks[:cB.p+1]
+	} else {
+		cB.stacks = append(cB.stacks[:cB.p+1], cB.stacks[cB.p+2:]...)
+	}
 }
 
 // NewStack implements "[".
@@ -518,11 +531,11 @@ func (cB *CodeBox) NewStack(n int) {
 	cB.p++
 	if cB.p == len(cB.stacks) {
 		cB.stacks = append(cB.stacks, NewStack(cB.stacks[cB.p-1].S[len(cB.stacks[cB.p-1].S)-n:]))
-		cB.stacks[cB.p-1].S = cB.stacks[cB.p-1].S[:len(cB.stacks[cB.p-1].S)-n]
 	} else {
 		cB.stacks[cB.p].S = cB.stacks[cB.p-1].S[len(cB.stacks[cB.p-1].S)-n:]
 		cB.stacks[cB.p].filledRegister = false
 	}
+	cB.stacks[cB.p-1].S = cB.stacks[cB.p-1].S[:len(cB.stacks[cB.p-1].S)-n]
 	if cB.compMode {
 		cB.stacks[cB.p].Reverse() // This is done to match the fishlanguage.com interpreter...
 	}
@@ -535,8 +548,12 @@ func (cB *CodeBox) Call() {
 		cB.stacks = append(cB.stacks, NewStack([]float64{float64(cB.fX), float64(cB.fY)}))
 		cB.stacks[cB.p], cB.stacks[cB.p-1] = cB.stacks[cB.p-1], cB.stacks[cB.p]
 	} else {
-		cB.stacks[cB.p] = cB.stacks[cB.p-1]
-		cB.stacks[cB.p-1] = NewStack([]float64{float64(cB.fX), float64(cB.fY)})
+		tstacks := make([]*Stack, cB.p+1, len(cB.stacks)+1)
+		copy(tstacks, cB.stacks[:cB.p])
+		tstacks[cB.p] = tstacks[cB.p-1]
+		tstacks[cB.p-1] = NewStack([]float64{float64(cB.fX), float64(cB.fY)})
+		tstacks = append(tstacks, cB.stacks[cB.p+1:]...)
+		cB.stacks = tstacks
 	}
 	cB.fY = int(cB.Pop())
 	cB.fX = int(cB.Pop())
@@ -548,6 +565,11 @@ func (cB *CodeBox) Ret() {
 	cB.fY = int(cB.Pop())
 	cB.fX = int(cB.Pop())
 	cB.stacks[cB.p] = cB.stacks[cB.p+1]
+	if cB.p+2 == len(cB.stacks) {
+		cB.stacks = cB.stacks[:cB.p+1]
+	} else {
+		cB.stacks = append(cB.stacks[:cB.p+1], cB.stacks[cB.p+2:]...)
+	}
 }
 
 // PrintBox outputs the codebox to stdout.

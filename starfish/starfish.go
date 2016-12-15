@@ -546,8 +546,11 @@ func (cB *CodeBox) NewStack(n int) {
 	if cB.p == len(cB.stacks) {
 		cB.stacks = append(cB.stacks, NewStack(cB.stacks[cB.p-1].S[len(cB.stacks[cB.p-1].S)-n:]))
 	} else {
-		cB.stacks[cB.p].S = cB.stacks[cB.p-1].S[len(cB.stacks[cB.p-1].S)-n:]
-		cB.stacks[cB.p].filledRegister = false
+		tstacks := make([]*Stack, cB.p+1, len(cB.stacks)+1)
+		copy(tstacks, cB.stacks[:cB.p])
+		tstacks[cB.p] = NewStack(cB.stacks[cB.p-1].S[len(cB.stacks[cB.p-1].S)-n:])
+		tstacks = append(tstacks, cB.stacks[cB.p:]...)
+		cB.stacks = tstacks
 	}
 	cB.stacks[cB.p-1].S = cB.stacks[cB.p-1].S[:len(cB.stacks[cB.p-1].S)-n]
 	if cB.compMode {
@@ -566,7 +569,7 @@ func (cB *CodeBox) Call() {
 		copy(tstacks, cB.stacks[:cB.p])
 		tstacks[cB.p] = tstacks[cB.p-1]
 		tstacks[cB.p-1] = NewStack([]float64{float64(cB.fX), float64(cB.fY)})
-		tstacks = append(tstacks, cB.stacks[cB.p+1:]...)
+		tstacks = append(tstacks, cB.stacks[cB.p:]...)
 		cB.stacks = tstacks
 	}
 	cB.fY = int(cB.Pop())

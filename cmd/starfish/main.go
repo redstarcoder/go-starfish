@@ -96,8 +96,10 @@ func main() {
 				if showcodebox {
 					cB.PrintBox()
 				}
-				stack.Set("innerHTML", fmt.Sprintln(cB.Stack()))
-				time.Sleep(time.Millisecond * time.Duration(delayms))
+				if delayms > 0 {
+					stack.Set("innerHTML", fmt.Sprintln(cB.Stack()))
+					time.Sleep(time.Millisecond * time.Duration(delayms))
+				}
 				for pause {
 					if !showcodebox {
 						cB.PrintBox()
@@ -105,6 +107,7 @@ func main() {
 					time.Sleep(time.Millisecond * 200)
 				}
 			}
+			stack.Set("innerHTML", fmt.Sprintln(cB.Stack()))
 			run.Set("disabled", false)
 		}()
 	})

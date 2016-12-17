@@ -93,10 +93,10 @@ func main() {
 			stack.Set("innerHTML", fmt.Sprintln(cB.Stack()))
 			time.Sleep(time.Millisecond * time.Duration(delayms))
 			for !cB.Swim() && !stop {
-				if showcodebox {
-					cB.PrintBox()
-				}
 				if delayms > 0 {
+					if showcodebox {
+						cB.PrintBox()
+					}
 					stack.Set("innerHTML", fmt.Sprintln(cB.Stack()))
 					time.Sleep(time.Millisecond * time.Duration(delayms))
 				}
@@ -107,6 +107,7 @@ func main() {
 					time.Sleep(time.Millisecond * 200)
 				}
 			}
+			cB.PrintBox()
 			stack.Set("innerHTML", fmt.Sprintln(cB.Stack()))
 			run.Set("disabled", false)
 		}()

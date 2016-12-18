@@ -6,7 +6,7 @@ A [\*><>](https://esolangs.org/wiki/Starfish)  interpreter written in Go. \*><> 
 Installation
 ---------------
 
-Install [golang](http://golang.org/doc/install). To install or update go-fish on your system, run:
+Install [golang](http://golang.org/doc/install). To install or update starfish on your system, run:
 
 ```
 go install github.com/redstarcoder/go-starfish/cmd/starfish

@@ -32,7 +32,9 @@ type Stack struct {
 
 // NewStack returns a pointer to a Stack populated with s.
 func NewStack(s []float64) *Stack {
-	return &Stack{S: s}
+	newS := make([]float64, len(s))
+	copy(newS, s)
+	return &Stack{S: newS}
 }
 
 // Register implements "&".
@@ -92,7 +94,7 @@ func (s *Stack) ShiftLeft() {
 
 // Push appends r to the end of the stack.
 func (s *Stack) Push(r float64) {
-	s.S = append(s.S, float64(r))
+	s.S = append(s.S, r)
 }
 
 // Pop removes the value on the end of the stack and returns it.

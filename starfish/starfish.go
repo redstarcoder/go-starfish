@@ -141,6 +141,8 @@ type CodeBox struct {
 	JSObjects
 	fX, fY        int
 	fDir          Direction
+	wasLeft       bool
+	escapedHook   bool
 	width, height int
 	box           [][]byte
 	stacks        []*Stack
@@ -192,12 +194,14 @@ func (cB *CodeBox) Exe(r byte) bool {
 		return false
 	case '>':
 		cB.fDir = Right
+		cB.wasLeft = false
 		return false
 	case 'v':
 		cB.fDir = Down
 		return false
 	case '<':
 		cB.fDir = Left
+		cB.wasLeft = true
 		return false
 	case '^':
 		cB.fDir = Up
@@ -205,8 +209,10 @@ func (cB *CodeBox) Exe(r byte) bool {
 	case '|':
 		if cB.fDir == Right {
 			cB.fDir = Left
+			cB.wasLeft = true
 		} else if cB.fDir == Left {
 			cB.fDir = Right
+			cB.wasLeft = false
 		}
 		return false
 	case '_':
@@ -220,10 +226,12 @@ func (cB *CodeBox) Exe(r byte) bool {
 		switch cB.fDir {
 		case Right:
 			cB.fDir = Left
+			cB.wasLeft = true
 		case Down:
 			cB.fDir = Up
 		case Left:
 			cB.fDir = Right
+			cB.wasLeft = false
 		case Up:
 			cB.fDir = Down
 		}
@@ -234,10 +242,12 @@ func (cB *CodeBox) Exe(r byte) bool {
 			cB.fDir = Up
 		case Down:
 			cB.fDir = Left
+			cB.wasLeft = true
 		case Left:
 			cB.fDir = Down
 		case Up:
 			cB.fDir = Right
+			cB.wasLeft = false
 		}
 		return false
 	case '\\':
@@ -246,18 +256,43 @@ func (cB *CodeBox) Exe(r byte) bool {
 			cB.fDir = Down
 		case Down:
 			cB.fDir = Right
+			cB.wasLeft = false
 		case Left:
 			cB.fDir = Up
 		case Up:
 			cB.fDir = Left
+			cB.wasLeft = true
 		}
 		return false
 	case 'x':
 		cB.fDir = Direction(rand.Int31n(4))
+		switch cB.fDir {
+		case Right:
+			cB.wasLeft = false
+		case Left:
+			cB.wasLeft = true
+		}
 		return false
 	// *><> commands
 	case 'O':
 		cB.deepSea = false
+		return false
+	case '`':
+		if cB.fDir == Down || cB.fDir == Up {
+			if cB.wasLeft {
+				cB.fDir = Left
+			} else {
+				cB.fDir = Right
+			}
+		} else {
+			if cB.escapedHook {
+				cB.fDir = Up
+				cB.escapedHook = false
+			} else {
+				cB.fDir = Down
+				cB.escapedHook = true
+			}
+		}
 		return false
 	}
 

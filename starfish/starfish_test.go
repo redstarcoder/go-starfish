@@ -143,8 +143,9 @@ func TestPrintBox(t *testing.T) {
 }
 
 func TestStackLength(t *testing.T) {
-	cB := NewCodeBox(";", []float64{TESTVALUE1, TESTVALUE2, TESTVALUE3}, false)
-	if cB.StackLength() != 3 {
+	cB := NewCodeBox("l;", []float64{TESTVALUE1, TESTVALUE2, TESTVALUE3}, false)
+	cB.Swim()
+	if cB.Stack()[3] != 3 {
 		t.Fail()
 	}
 }
@@ -178,6 +179,16 @@ func TestMovement(t *testing.T) {
 
 	cB = NewCodeBox("v\n;", []float64{}, false)
 	cB.Swim()
+	if !cB.Swim() {
+		t.Fail()
+	}
+
+	cB = NewCodeBox("`;\n`", []float64{}, false)
+	for i := 0;i < 5;i++ {
+		if cB.Swim() {
+			t.Fail()
+		}
+	}
 	if !cB.Swim() {
 		t.Fail()
 	}

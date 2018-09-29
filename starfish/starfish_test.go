@@ -1,9 +1,9 @@
 package starfish
 
 import (
+	"log"
 	"testing"
 	"time"
-	"log"
 )
 
 const (
@@ -11,6 +11,14 @@ const (
 	TESTVALUE2 = 2
 	TESTVALUE3 = 3
 	TESTVALUE4 = 4
+	SCRIPT     = `r>l5(?v~~~/:!|Ou+1Ox:@=?~~~~~~~!
+~~l5(?v" "/
+ ~;!?l<` // Script used in "BenchmarkScript"
+)
+
+var (
+	INITIALSTACK = []float64{float64('h'), float64('e'), float64('l'), float64('l'), float64('o'),
+		float64(' '), float64('w'), float64('o'), float64('r'), float64('l'), float64('d')} // Stack used in "BenchmarkScript"
 )
 
 func runscript(script string, initialstack []float64, compMode bool) *CodeBox {
@@ -22,6 +30,19 @@ func runscript(script string, initialstack []float64, compMode bool) *CodeBox {
 		}
 	}
 	return cB
+}
+
+func BenchmarkScript(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		b.StopTimer()
+		stack := make([]float64, len(INITIALSTACK))
+		copy(stack, INITIALSTACK)
+		cB := NewCodeBox(SCRIPT, stack, false)
+		b.StartTimer()
+		for !cB.Swim() {
+		}
+	}
+	log.Println(b.N)
 }
 
 func TestStackRegister(t *testing.T) {
@@ -92,7 +113,7 @@ func TestNewStackCloseStack(t *testing.T) {
 	if s.S[0] != TESTVALUE1 || s.S[1] != TESTVALUE2 || s2.S[0] != TESTVALUE3 || s2.S[1] != TESTVALUE4 || len(s.S) != 2 || len(s2.S) != 2 {
 		t.FailNow()
 	}
-	
+
 	cB.Swim()
 	s = cB.stacks[0]
 	if s.S[0] != TESTVALUE1 || s.S[1] != TESTVALUE2 || s.S[2] != TESTVALUE3 || s.S[3] != TESTVALUE4 || len(s.S) != 4 {
@@ -108,7 +129,7 @@ func TestNewStackCloseStackCompatibility(t *testing.T) {
 	if s.S[0] != TESTVALUE1 || s.S[1] != TESTVALUE2 || s2.S[1] != TESTVALUE3 || s2.S[0] != TESTVALUE4 || len(s.S) != 2 || len(s2.S) != 2 {
 		t.FailNow()
 	}
-	
+
 	cB.Swim()
 	s = cB.stacks[0]
 	if s.S[0] != TESTVALUE1 || s.S[1] != TESTVALUE2 || s.S[2] != TESTVALUE3 || s.S[3] != TESTVALUE4 || len(s.S) != 4 {
@@ -122,8 +143,9 @@ func TestPrintBox(t *testing.T) {
 }
 
 func TestStackLength(t *testing.T) {
-	cB := NewCodeBox(";", []float64{TESTVALUE1, TESTVALUE2, TESTVALUE3}, false)
-	if cB.StackLength() != 3 {
+	cB := NewCodeBox("l;", []float64{TESTVALUE1, TESTVALUE2, TESTVALUE3}, false)
+	cB.Swim()
+	if cB.Stack()[3] != 3 {
 		t.Fail()
 	}
 }
@@ -142,21 +164,31 @@ func TestMovement(t *testing.T) {
 	if !cB.Swim() {
 		t.Fail()
 	}
-	
+
 	cB = NewCodeBox("<;", []float64{}, false)
 	cB.Swim()
 	if !cB.Swim() {
 		t.Fail()
 	}
-	
+
 	cB = NewCodeBox("^\n;", []float64{}, false)
 	cB.Swim()
 	if !cB.Swim() {
 		t.Fail()
 	}
-	
+
 	cB = NewCodeBox("v\n;", []float64{}, false)
 	cB.Swim()
+	if !cB.Swim() {
+		t.Fail()
+	}
+
+	cB = NewCodeBox("`;\n`", []float64{}, false)
+	for i := 0;i < 5;i++ {
+		if cB.Swim() {
+			t.Fail()
+		}
+	}
 	if !cB.Swim() {
 		t.Fail()
 	}

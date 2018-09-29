@@ -64,18 +64,12 @@ func (s *Stack) Reverse() {
 
 // SwapTwo implements "$".
 func (s *Stack) SwapTwo() {
-	x := s.S[len(s.S)-1]
-	s.S[len(s.S)-1] = s.S[len(s.S)-2]
-	s.S[len(s.S)-2] = x
+	s.S[len(s.S)-1], s.S[len(s.S)-2] = s.S[len(s.S)-2], s.S[len(s.S)-1]
 }
 
 // SwapThree implements "@": with [1,2,3,4], calling "@" results in [,4,2,3].
 func (s *Stack) SwapThree() {
-	x := s.S[len(s.S)-1]
-	y := s.S[len(s.S)-2]
-	s.S[len(s.S)-1] = y
-	s.S[len(s.S)-2] = s.S[len(s.S)-3]
-	s.S[len(s.S)-3] = x
+	s.S[len(s.S)-1], s.S[len(s.S)-2], s.S[len(s.S)-3] = s.S[len(s.S)-2], s.S[len(s.S)-3], s.S[len(s.S)-1]
 }
 
 // ShiftRight implements "}".

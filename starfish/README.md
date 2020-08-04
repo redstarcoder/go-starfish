@@ -7,7 +7,7 @@ Package starfish offers a library for running \*><> programs in Go.
 Installation
 ---------------
 
-Install [golang](http://golang.org/doc/install). To install or update the package fish on your system, run:
+Install [golang](http://golang.org/doc/install). To install or update the package on your system, run:
 
 ```
 go get -u github.com/redstarcoder/go-starfish/starfish

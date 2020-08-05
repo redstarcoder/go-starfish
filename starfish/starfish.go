@@ -172,25 +172,25 @@ func NewCodeBox(script string, stack []float64, compatibilityMode bool) *CodeBox
 	return cB
 }
 
-// Exe executes the instruction the ><> is currently on top of. It returns true when it executes ";".
-func (cB *CodeBox) Exe(r byte) bool {
+// Exe executes the instruction the ><> is currently on top of. It returns the string it intends to output (nil if none) and true when it executes ";".
+func (cB *CodeBox) Exe(r byte) (string, bool) {
 	switch r {
 	case ' ':
-		return false
+		return "", false
 	case '>':
 		cB.fDir = Right
 		cB.wasLeft = false
-		return false
+		return "", false
 	case 'v':
 		cB.fDir = Down
-		return false
+		return "", false
 	case '<':
 		cB.fDir = Left
 		cB.wasLeft = true
-		return false
+		return "", false
 	case '^':
 		cB.fDir = Up
-		return false
+		return "", false
 	case '|':
 		if cB.fDir == Right {
 			cB.fDir = Left
@@ -199,14 +199,14 @@ func (cB *CodeBox) Exe(r byte) bool {
 			cB.fDir = Right
 			cB.wasLeft = false
 		}
-		return false
+		return "", false
 	case '_':
 		if cB.fDir == Down {
 			cB.fDir = Up
 		} else if cB.fDir == Up {
 			cB.fDir = Down
 		}
-		return false
+		return "", false
 	case '#':
 		switch cB.fDir {
 		case Right:
@@ -220,7 +220,7 @@ func (cB *CodeBox) Exe(r byte) bool {
 		case Up:
 			cB.fDir = Down
 		}
-		return false
+		return "", false
 	case '/':
 		switch cB.fDir {
 		case Right:
@@ -234,7 +234,7 @@ func (cB *CodeBox) Exe(r byte) bool {
 			cB.fDir = Right
 			cB.wasLeft = false
 		}
-		return false
+		return "", false
 	case '\\':
 		switch cB.fDir {
 		case Right:
@@ -248,7 +248,7 @@ func (cB *CodeBox) Exe(r byte) bool {
 			cB.fDir = Left
 			cB.wasLeft = true
 		}
-		return false
+		return "", false
 	case 'x':
 		cB.fDir = Direction(rand.Int31n(4))
 		switch cB.fDir {
@@ -257,11 +257,11 @@ func (cB *CodeBox) Exe(r byte) bool {
 		case Left:
 			cB.wasLeft = true
 		}
-		return false
+		return "", false
 	// *><> commands
 	case 'O':
 		cB.deepSea = false
-		return false
+		return "", false
 	case '`':
 		if cB.fDir == Down || cB.fDir == Up {
 			if cB.wasLeft {
@@ -278,18 +278,20 @@ func (cB *CodeBox) Exe(r byte) bool {
 				cB.escapedHook = true
 			}
 		}
-		return false
+		return "", false
 	}
 
 	if cB.deepSea {
-		return false
+		return "", false
 	}
 
+	var output string
+	
 	switch r {
 	default:
 		panic(string(r))
 	case ';':
-		return true
+		return "", true
 	case '"', '\'':
 		if cB.stringMode == 0 {
 			cB.stringMode = r
@@ -303,9 +305,9 @@ func (cB *CodeBox) Exe(r byte) bool {
 	case '&':
 		cB.Register()
 	case 'o':
-		fmt.Print(string(byte(cB.Pop())))
+        output = string(rune(cB.Pop()))
 	case 'n':
-		fmt.Printf("%v", cB.Pop())
+		output = fmt.Sprintf("%v", cB.Pop())
 	case 'r':
 		cB.ReverseStack()
 	case '+':
@@ -435,7 +437,7 @@ func (cB *CodeBox) Exe(r byte) bool {
 	case 'D':
 		cB.p--
 	}
-	return false
+	return output, false
 }
 
 // Move changes the fish's x/y coordinates based on CodeBox.fDir.
@@ -464,8 +466,8 @@ func (cB *CodeBox) Move() {
 	}
 }
 
-// Swim causes the ><> to execute an instruction, then move. It returns true when it encounters ";".
-func (cB *CodeBox) Swim() bool {
+// Swim causes the ><> to execute an instruction, then move. It returns a string of non-zero length when it has output and true when it encounters ";".
+func (cB *CodeBox) Swim() (string, bool) {
 	defer func() {
 		if r := recover(); r != nil {
 			cB.PrintBox()
@@ -475,13 +477,18 @@ func (cB *CodeBox) Swim() bool {
 		}
 	}()
 
+    var (
+        output string
+        end bool
+    )
+    
 	if r := cB.box[cB.fY][cB.fX]; cB.stringMode != 0 && r != cB.stringMode {
 		cB.Push(float64(r))
-	} else if cB.Exe(r) {
-		return true
+	} else {
+        output, end = cB.Exe(r)
 	}
 	cB.Move()
-	return false
+	return output, end
 }
 
 // Stack returns the underlying Stack slice.

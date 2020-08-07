@@ -628,6 +628,16 @@ func (cB *CodeBox) PrintBox() {
 	}
 }
 
+// Output the CodeBox's width/height
+func (cB *CodeBox) Size() (int, int) {
+    return cB.width, cB.height
+}
+
+// Output the CodeBox's x/y
+func (cB *CodeBox) Loc() (int, int) {
+    return cB.fX, cB.fY
+}
+
 func init() {
 	rand.Seed(int64(time.Now().Nanosecond()))
 	reader = make(chan byte, 1024)

@@ -648,6 +648,11 @@ func (cB *CodeBox) Box() [][]byte {
 	return outBox
 }
 
+// DeepSea returns whether the codebox is in DeepSea mode
+func (cB *CodeBox) DeepSea() bool {
+	return cB.deepSea
+}
+
 func init() {
 	rand.Seed(int64(time.Now().Nanosecond()))
 	reader = make(chan byte, 1024)

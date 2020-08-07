@@ -665,6 +665,9 @@ func init() {
 				for i := 0; i < n; i++ {
 					reader <- b[i]
 				}
+			} else {
+				fmt.Println(err)
+				return
 			}
 		}
 	}()

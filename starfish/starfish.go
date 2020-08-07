@@ -655,7 +655,7 @@ func (cB *CodeBox) DeepSea() bool {
 func init() {
 	rand.Seed(int64(time.Now().Nanosecond()))
 	reader = make(chan byte, 1024)
-/*	go func() {
+	go func() {
 		var err error
 		b := make([]byte, 1024)
 		for err == nil {
@@ -669,5 +669,5 @@ func init() {
 				return
 			}
 		}
-	}()*/
+	}()
 }

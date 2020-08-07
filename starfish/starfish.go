@@ -286,7 +286,7 @@ func (cB *CodeBox) Exe(r byte) (string, bool) {
 	}
 
 	var output string
-	
+
 	switch r {
 	default:
 		panic(string(r))
@@ -305,7 +305,7 @@ func (cB *CodeBox) Exe(r byte) (string, bool) {
 	case '&':
 		cB.Register()
 	case 'o':
-        output = string(rune(cB.Pop()))
+		output = string(rune(cB.Pop()))
 	case 'n':
 		output = fmt.Sprintf("%v", cB.Pop())
 	case 'r':
@@ -477,15 +477,15 @@ func (cB *CodeBox) Swim() (string, bool) {
 		}
 	}()
 
-    var (
-        output string
-        end bool
-    )
-    
+	var (
+		output string
+		end    bool
+	)
+
 	if r := cB.box[cB.fY][cB.fX]; cB.stringMode != 0 && r != cB.stringMode {
 		cB.Push(float64(r))
 	} else {
-        output, end = cB.Exe(r)
+		output, end = cB.Exe(r)
 	}
 	cB.Move()
 	return output, end
@@ -628,14 +628,24 @@ func (cB *CodeBox) PrintBox() {
 	}
 }
 
-// Output the CodeBox's width/height
+// Size returns the CodeBox's width/height
 func (cB *CodeBox) Size() (int, int) {
-    return cB.width, cB.height
+	return cB.width, cB.height
 }
 
-// Output the CodeBox's x/y
+// Loc returns the CodeBox's x/y
 func (cB *CodeBox) Loc() (int, int) {
-    return cB.fX, cB.fY
+	return cB.fX, cB.fY
+}
+
+// Box returns a copy of the 2D slice containing the *><> script
+func (cB *CodeBox) Box() [][]byte {
+	outBox := make([][]byte, len(cB.box))
+	for i := range cB.box {
+		outBox[i] = make([]byte, len(cB.box[i]))
+		copy(outBox[i], cB.box[i])
+	}
+	return outBox
 }
 
 func init() {

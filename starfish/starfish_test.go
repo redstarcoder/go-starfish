@@ -13,7 +13,7 @@ const (
 	TESTVALUE4 = 4
 	SCRIPT     = `r>l5(?v~~~/:!|Ou+1Ox:@=?~~~~~~~!
 ~~l5(?v" "/
- ~;!?l<` // Script used in "BenchmarkScript"
+ ~;!?l<`  // Script used in "BenchmarkScript"
 )
 
 var (
@@ -184,7 +184,7 @@ func TestMovement(t *testing.T) {
 	}
 
 	cB = NewCodeBox("`;\n`", []float64{}, false)
-	for i := 0;i < 5;i++ {
+	for i := 0; i < 5; i++ {
 		if cB.Swim() {
 			t.Fail()
 		}

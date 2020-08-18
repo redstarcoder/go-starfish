@@ -10,14 +10,14 @@ import (
 )
 
 var (
-	showcodebox = flag.Bool("c", false, "output the codebox each tick")
-	flagscript = flag.String("code", "", "execute the script supplied in 'code'")
-	showstack = flag.Bool("s", false, "output the stack each tick")
-	help *bool = flag.Bool("h", false, "display this help message")
-	delay = flag.Duration("t", 0, "time to sleep between ticks (ex: 100ms)")
-	compmode = flag.Bool("m", false, "run like the fishlanguage.com interpreter")
-	initialstack = &stack{[]float64{}}
-	fName = "fish"
+	showcodebox        = flag.Bool("c", false, "output the codebox each tick")
+	flagscript         = flag.String("code", "", "execute the script supplied in 'code'")
+	showstack          = flag.Bool("s", false, "output the stack each tick")
+	help         *bool = flag.Bool("h", false, "display this help message")
+	delay              = flag.Duration("t", 0, "time to sleep between ticks (ex: 100ms)")
+	compmode           = flag.Bool("m", false, "run like the fishlanguage.com interpreter")
+	initialstack       = &stack{[]float64{}}
+	fName              = "fish"
 )
 
 func Error() {
@@ -57,7 +57,15 @@ func main() {
 
 	cB := starfish.NewCodeBox(script, initialstack.s, *compmode)
 	if !*showcodebox && !*showstack && *delay == 0 {
-		for !cB.Swim() {}
+		var (
+			end    bool
+			output string
+		)
+		for ; !end; output, end = cB.Swim() {
+			if output != "" {
+				fmt.Print(output)
+			}
+		}
 		return
 	}
 	if *showcodebox {
@@ -67,7 +75,14 @@ func main() {
 		fmt.Println("Stack:", cB.Stack())
 	}
 	time.Sleep(*delay)
-	for !cB.Swim() {
+	var (
+		end    bool
+		output string
+	)
+	for ; !end; output, end = cB.Swim() {
+		if output != "" {
+			fmt.Print(output)
+		}
 		if *showcodebox {
 			cB.PrintBox()
 		}

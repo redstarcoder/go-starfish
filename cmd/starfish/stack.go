@@ -1,8 +1,8 @@
 package main
 
 import (
-	"strconv"
 	"errors"
+	"strconv"
 )
 
 type stack struct {
@@ -17,7 +17,7 @@ func (s *stack) Set(str string) error {
 	var strMode byte
 	runes := make([]rune, 0, 32)
 	s.s = make([]float64, 0, 32)
-	for _, r := range(str) {
+	for _, r := range str {
 		if strMode != 0 && byte(r) != strMode {
 			s.s = append(s.s, float64(r))
 			continue

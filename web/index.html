@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Go wasm</title>
+		<script language="javascript" src="lz-string.js"></script>
+		<script language="javascript">
+		function getUrlVars() {
+			var vars = {};
+			var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+				vars[key] = value;
+			});
+			return vars;
+		}
+	</script>
+        <style>
+            body {
+                font-family:sans-serif;
+                color:#0f0f0f;
+            }
+                
+            c {
+                width:1.5em;
+                display:inline-block;
+                text-align:center;
+            }
+
+            .s {
+                color:red;
+                background-color:black;
+            }
+
+            .u {
+                color:blue;
+                background-color:white;
+            }
+
+            input {
+                border-radius:5px;
+                padding:0.25em;
+            }
+
+            textarea {
+                border-radius:5px;
+                display:inline-block;
+                vertical-align:middle;
+            }
+
+            .box {
+                display:block;
+                width:90%;
+                border-style:solid;
+                border-radius:7px;
+                border-width:1px;
+                margin: 0 auto;
+                padding:1em;
+                border-color:#D3D3D3;
+            }
+
+            .desc {
+                display:inline-block;
+                text-align:center;
+                width:10em;
+                font-weight:bold;
+                color:#202020;
+                font-size:0.9em;
+                vertical-align:middle;
+            }
+        </style>
+    </head>
+
+    <body style="background-color:#D3D3D3;">
+        <div style="width:75%;margin: 0 auto;border:solid;border-width:1px;padding:1em;border-radius:3px;background-color:white;">
+        <h1 style="text-align:center;">The online *&gt;&lt;&gt; interpreter</h1>
+        <textarea id="script" cols="40" rows="5" style="width:100%;font-family:monospace;" wrap="off"></textarea><br>
+        
+        <div style="margin:1em;">
+        <button id="run" type="button" disabled>Run</button>
+        <button id="pause" type="button">Pause</button>
+        <button id="end" type="button">Stop</button>
+        <button id="share" type="button">Share</button><br>
+        </div>
+        
+        <div id="sharebox" class="box" style="display:none;"><span class="desc">Share</span>
+        <input id="sharefield" value="" size="50" onclick="this.select();" style="width:75%;" type="text"></div><br>
+        <div class="box"><span class="desc">Delay (ms)</span>
+        <input id="delay" value="1" type="text"></div><br>
+        <div class="box"><span class="desc">Initial stack</span>
+        <input id="initialstack" style="width:75%;" type="text"></div><br>
+        <div class="box"><span class="desc">Input</span>
+        <textarea id="inputfield" cols="40" rows="2" value="" style="display:inline-block;"></textarea>
+        <button id="give" type="button">Give</button></div><br><br>
+        
+        <!--<div class="box"><span class="desc"><button id="showhide" type="button">Show CodeBox</button></span>-->
+        <div class="box"><span class="desc">CodeBox</span>
+        <div id="codebox" style="font-family:monospace;font-weight:bold;font-size:1.1em;background-color:#E0FFFF;width:100%;vertical-align:middle;"></div></div><br>
+        <div class="box"><span class="desc">Stack</span>
+        <div id="stack" style="font-family:monospace;display:inline-block;vertical-align:middle;"></div></div><br>
+        <div class="box"><span class="desc">Input</span><div id="input" style="font-family:monospace;display:inline-block;vertical-align:middle;"></div></div><br>
+        <div class="box"><span class="desc">Output</span><div style="font-family:monospace;display:inline-block;vertical-align:middle;"><pre id="output"></pre></div></div><br><br>
+        
+        <script src="wasm_exec.js"></script>
+        <script>
+            if (!WebAssembly.instantiateStreaming) {
+                // polyfill
+                WebAssembly.instantiateStreaming = async (resp, importObject) => {
+                    const source = await (await resp).arrayBuffer();
+                    return await WebAssembly.instantiate(source, importObject);
+                };
+            }
+
+            const go = new Go();
+
+            let mod, inst;
+
+            WebAssembly.instantiateStreaming(fetch("starfish.wasm"), go.importObject).then(
+                async result => {
+                        document.getElementById("run").disabled = false;
+                        mod = result.module;
+                        inst = result.instance;
+                        go.run(inst);
+                    }
+            );
+        </script>
+    </body>
+</html>

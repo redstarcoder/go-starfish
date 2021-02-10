@@ -104,15 +104,18 @@ func stepRun(delay int) {
 					rString, _ := r.(string)
 					outString += "\n" + rString
 					outBox.Set("innerText", outString)
-					stackBox.Set("innerText", fmt.Sprintln(globalCB.Stack()))
+					if globalCB != nil {
+						stackBox.Set("innerText", fmt.Sprintln(globalCB.Stack()))
 
-					if x < width && y < height {
-						if !globalCB.DeepSea() {
-							document.Call("getElementById", fmt.Sprintf("%dx%d", x, y)).Call("setAttribute", "class", "s")
-						} else {
-							document.Call("getElementById", fmt.Sprintf("%dx%d", x, y)).Call("setAttribute", "class", "u")
+						if x < width && y < height {
+							if !globalCB.DeepSea() {
+								document.Call("getElementById", fmt.Sprintf("%dx%d", x, y)).Call("setAttribute", "class", "s")
+							} else {
+								document.Call("getElementById", fmt.Sprintf("%dx%d", x, y)).Call("setAttribute", "class", "u")
+							}
 						}
 					}
+					stopscript(this, args)
 				}
 			}()
 
@@ -128,7 +131,11 @@ func stepRun(delay int) {
 				outBox.Set("innerText", outString)
 				// print(output)
 			}
-			stackBox.Set("innerText", fmt.Sprintln(globalCB.Stack()))
+			if globalCB != nil {
+				stackBox.Set("innerText", fmt.Sprintln(globalCB.Stack()))
+			} else {
+				end = true
+			}
 			if !end {
 				x, y = globalCB.Loc()
 				ExecutionTimer = window.Call("setTimeout", "stepRun();", delay).JSValue()
